@@ -32,3 +32,7 @@ model/model_3.json
 model/model_4.h5
 model/model_4.json
 model/model_5_t.h5
+.venv/
+.vscode/
+assets/
+

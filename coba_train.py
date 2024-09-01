@@ -1,16 +1,16 @@
 import cv2
 import os
 import numpy as np
-import tensorflow as tf
 from datetime import datetime
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Flatten
 from tensorflow.keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 
+
 # Setup directories
 save_directory = "C:\\TA\\trainCNN\\dataset"
-classes = ['maju', 'mundur', 'kanan', 'kiri', 'stop']
+classes = ['Maju', 'Mundur', 'Kanan', 'Kiri', 'Stop']
 os.makedirs(save_directory, exist_ok=True)
 for class_name in classes:
     os.makedirs(os.path.join(save_directory, class_name), exist_ok=True)
@@ -42,37 +42,15 @@ def load_data():
 
 def build_model():
     model = Sequential([
-        # First convolutional layer
-        tf.keras.layers.Conv2D(32, (3,3), activation='relu', input_shape=(30, 200, 3), padding='same'),
-        tf.keras.layers.MaxPool2D(2,2),
-
-        # Second convolutional layer
-        tf.keras.layers.Conv2D(64, (3,3), activation='relu', padding='same'),
-        tf.keras.layers.MaxPool2D(2,2),
-
-        # Third convolutional layer
-        tf.keras.layers.Conv2D(128, (3,3), activation='relu', padding='same'),
-        tf.keras.layers.MaxPool2D(2,2),
-
-        # Dropout layer after third convolutional layer
-        tf.keras.layers.Dropout(0.25),
-
-        # Flatten the output and feed it into a dense layer
-        tf.keras.layers.Flatten(),
-
-        # Dense layer with 256 neurons
-        tf.keras.layers.Dense(256, activation='relu'),
-
-        # Dropout layer before the output layer
-        tf.keras.layers.Dropout(0.5),
-
-        # Output layer with 5 neurons (one for each class) and softmax activation
-        tf.keras.layers.Dense(5, activation='softmax')
+        Flatten(input_shape=(64, 64, 3)),
+        Dense(128, activation='relu'),
+        Dense(64, activation='relu'),
+        Dense(len(classes), activation='softmax')
     ])
-
     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-    return model
+    # plot_model(model, to_file='model_architecture.png', show_shapes=True, show_layer_names=True)
 
+    return model
 
 model = None
 

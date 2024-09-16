@@ -35,4 +35,6 @@ model/model_5_t.h5
 .venv/
 .vscode/
 assets/
+/SDAvenv/
+
 

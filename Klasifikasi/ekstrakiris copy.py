@@ -198,7 +198,7 @@ while cap.isOpened():
             predicted_class = classes[np.argmax(predictions)]
             # Index class
             idx = np.argmax(predictions)
-            print(f"Predicted Class: {predicted_class}, Index: {idx}")
+            # print(f"Predicted Class: {predicted_class}, Index: {idx}")
 
             if idx == prev_idx:
                 counter += 1  # Increment the counter when the class stays the same
@@ -215,7 +215,7 @@ while cap.isOpened():
             if idx >= 0 and serIsError == True and current_time2 - start_time >= 300:
                 try:
                     ser = serial.Serial(
-                        port='COM8', baudrate=115200, timeout=1)
+                        port='COM11', baudrate=115200, timeout=1)
                     serIsError = False
                 except serial.SerialException as e:
                     print(f"Serial error: {e}")
@@ -255,13 +255,14 @@ while cap.isOpened():
                     kelasTemp = 'Mundur'
                     ser.write(arah.encode('utf-8'))
                     print(f"{arah} Telah Dikirim")
-                elif classes[np.argmax(predictions)] == 'Stop' and counter > 5:
+                elif classes[np.argmax(predictions)] == 'Stop' and counter:
                     arah = 'C\n'
                     # kecepatan = 0
                     # message = f"{arah},{kecepatan}"
                     kelasTemp = 'Stop'
                     ser.write(arah.encode('utf-8'))
                     print(f"{arah} Telah Dikirim")
+
                 else:
                     print(f"No Eyes Detected")
 

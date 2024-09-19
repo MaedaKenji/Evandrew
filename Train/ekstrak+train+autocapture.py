@@ -1,53 +1,21 @@
-# Import necessary libraries
-import tensorflow as tf
-import cv2
-import mediapipe as mp
-import numpy as np
 import datetime
-import time
-import serial
-import os
-from keras.models import load_model
 from datetime import datetime
-from tensorflow.keras.utils import to_categorical
-from sklearn.model_selection import train_test_split
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.preprocessing import image
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau
+from tensorflow.keras.preprocessing import image
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from sklearn.model_selection import train_test_split
+from tensorflow.keras.utils import to_categorical
+from helpers import *
+import os
+import serial
+import time
+import numpy as np
+import mediapipe as mp
+import cv2
+import tensorflow as tf
+import matplotlib.pyplot as plt
 
-
-kelasTemp = 'Start'
-print("Global kelasTemp initialized:", kelasTemp)
-classes = ['Kanan', 'Kiri', 'Maju', 'Mundur', 'Stop']
-prev_frame_time = 0
-idx = -1
-prev_idx = -1
-counter = 0
-start_time = time.time()
-serIsError = False
-model = None
-image_counts = {class_name: 0 for class_name in classes}
-max_images_per_class = 2000
-active_saving = {class_name: False for class_name in classes}
-
-
-# Setup directories
-save_directory = "C:\\TA\\trainCNN\\dataset"
-classes = ['Maju', 'Mundur', 'Kanan', 'Kiri', 'Stop']
-os.makedirs(save_directory, exist_ok=True)
-for class_name in classes:
-    os.makedirs(os.path.join(save_directory, class_name), exist_ok=True)
-
-
-# Initialize MediaPipe Face Mesh
-mp_face_mesh = mp.solutions.face_mesh
-face_mesh = mp_face_mesh.FaceMesh(
-    max_num_faces=1,
-    refine_landmarks=True,
-    min_detection_confidence=0.5,
-    min_tracking_confidence=0.5)
-
-# Function to preprocess the image
+# Function
 
 
 def preprocess_image(image, target_size=(200, 30)):
@@ -64,18 +32,6 @@ def get_combined_bounding_box(landmarks, img_width, img_height):
     x_min, x_max = min(x_coords) * img_width, max(x_coords) * img_width
     y_min, y_max = min(y_coords) * img_height, max(y_coords) * img_height
     return int(x_min), int(y_min), int(x_max), int(y_max)
-
-
-def initialize_image_counts():
-    image_counts = {}
-    for class_name in classes:
-        class_folder = os.path.join(save_directory, class_name)
-        if not os.path.exists(class_folder):
-            os.makedirs(class_folder)
-        # Count the number of existing images in the folder
-        image_counts[class_name] = len([name for name in os.listdir(
-            class_folder) if os.path.isfile(os.path.join(class_folder, name))])
-    return image_counts
 
 
 def save_frame(class_name, frame):
@@ -163,6 +119,52 @@ def build_model():
     # plot_model(model, to_file='model_architecture.png', show_shapes=True, show_layer_names=True)
 
     return model
+
+
+def initialize_image_counts():
+    image_counts = {}
+    for class_name in classes:
+        class_folder = os.path.join(save_directory, class_name)
+        if not os.path.exists(class_folder):
+            os.makedirs(class_folder)
+        # Count the number of existing images in the folder
+        image_counts[class_name] = len([name for name in os.listdir(
+            class_folder) if os.path.isfile(os.path.join(class_folder, name))])
+    return image_counts
+
+
+kelasTemp = 'Start'
+print("Global kelasTemp initialized:", kelasTemp)
+classes = ['Kanan', 'Kiri', 'Maju', 'Mundur', 'Stop']
+prev_frame_time = 0
+idx = -1
+prev_idx = -1
+counter = 0
+start_time = time.time()
+serIsError = False
+model = None
+
+# Setup directories
+save_directory = "C:\\TA\\trainCNN\\dataset"
+classes = ['Maju', 'Mundur', 'Kanan', 'Kiri', 'Stop']
+os.makedirs(save_directory, exist_ok=True)
+for class_name in classes:
+    os.makedirs(os.path.join(save_directory, class_name), exist_ok=True)
+
+image_counts = initialize_image_counts()
+max_images_per_class = 2000
+active_saving = {class_name: False for class_name in classes}
+
+
+# Initialize MediaPipe Face Mesh
+mp_face_mesh = mp.solutions.face_mesh
+face_mesh = mp_face_mesh.FaceMesh(
+    max_num_faces=1,
+    refine_landmarks=True,
+    min_detection_confidence=0.5,
+    min_tracking_confidence=0.5)
+
+# Function to preprocess the image
 
 
 try:
@@ -351,9 +353,26 @@ while cap.isOpened():
             callbacks=[rlrop],
             verbose=2
         )  # Fit 2
-        model.save('movement_classifier.h5')  # Old save
+        model.save('model6.h5')  # Old save
         # model.save('movement_classifier.keras') # New save
-        print("Model trained and saved as 'movement_classifier.h5'")
+        print("Model trained and saved as 'model6.h5'")
+
+        plt.plot(model_fit.history['accuracy'], label='Training Accuracy')
+        plt.plot(model_fit.history['val_accuracy'],
+                 label='Validation Accuracy')
+        plt.title('Training and Validation Accuracy')
+        plt.ylabel('value')
+        plt.xlabel('No. epoch')
+        plt.legend(loc="upper left")
+        plt.show()
+
+        plt.plot(model_fit.history['loss'], label='Training Loss')
+        plt.plot(model_fit.history['val_loss'], label='Validation Loss')
+        plt.title('Training and Validation Loss')
+        plt.ylabel('value')
+        plt.xlabel('No. epoch')
+        plt.legend(loc="upper left")
+        plt.show()
 
     # Display the resulting frame
     cv2.imshow('Frame', image)

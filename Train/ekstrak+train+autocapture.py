@@ -152,7 +152,7 @@ for class_name in classes:
     os.makedirs(os.path.join(save_directory, class_name), exist_ok=True)
 
 image_counts = initialize_image_counts()
-max_images_per_class = 2000
+max_images_per_class = 500
 active_saving = {class_name: False for class_name in classes}
 
 

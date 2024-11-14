@@ -74,7 +74,8 @@ model = tf.keras.models.Sequential([
 ])
 
 # Load the trained model
-model.load_weights(r'model/model_5_t.h5')
+# model.load_weights(r'model/model_5_t.h5')
+model.load_weights(r"model.h5")
 # model.load_weights('model6.h5')
 
 # Initialize MediaPipe Face Mesh
@@ -107,7 +108,7 @@ def get_combined_bounding_box(landmarks, img_width, img_height):
 try:
     ser = serial.Serial(port='COM11', baudrate=115200, timeout=1)
 except:
-    print("Setial error while connecting to serial port")
+    print("Serial error while connecting to serial port")
     serIsError = True
 
 
@@ -198,7 +199,7 @@ while cap.isOpened():
             predicted_class = classes[np.argmax(predictions)]
             # Index class
             idx = np.argmax(predictions)
-            # print(f"Predicted Class: {predicted_class}, Index: {idx}")
+            print(f"Predicted Class: {predicted_class}, Index: {idx}")
 
             if idx == prev_idx:
                 counter += 1  # Increment the counter when the class stays the same
@@ -255,7 +256,7 @@ while cap.isOpened():
                     kelasTemp = 'Mundur'
                     ser.write(arah.encode('utf-8'))
                     print(f"{arah} Telah Dikirim")
-                elif classes[np.argmax(predictions)] == 'Stop' and counter:
+                elif classes[np.argmax(predictions)] == 'Stop':
                     arah = 'C\n'
                     # kecepatan = 0
                     # message = f"{arah},{kecepatan}"
